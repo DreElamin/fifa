@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
 import _ from 'lodash'
 
 import { players } from './data/players.js'
@@ -22,6 +22,7 @@ import ClusterTab from './components/tabs/ClusterTab.jsx'
 import InsightsTab from './components/tabs/InsightsTab.jsx'
 import ScoutTab from './components/tabs/ScoutTab.jsx'
 import FilterSelect from './components/common/FilterSelect.jsx'
+import SoccerBall from './components/common/SoccerBall.jsx'
 
 // ─── Train ML models once at module load ──────────────────────────────────────
 const nn = new NeuralNetwork()
@@ -65,6 +66,7 @@ const TABS = [
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 export default function FIFAAnalyticsDashboard() {
+  const navRef = useRef(null)
   const [activeTab, setActiveTab]           = useState('overview')
   const [selectedClub, setSelectedClub]     = useState('all')
   const [selectedPosition, setSelectedPosition] = useState('all')
@@ -285,13 +287,18 @@ export default function FIFAAnalyticsDashboard() {
       </header>
 
       {/* ── Navigation ─────────────────────────────────────────────────── */}
-      <nav style={{
-        background: 'rgba(30,41,59,0.5)',
-        padding: '10px 40px',
-        borderBottom: '1px solid rgba(100,116,139,0.2)',
-        overflowX: 'auto',
-      }}>
-        <div style={{ display: 'flex', gap: 4, maxWidth: 1600, margin: '0 auto' }}>
+      <nav
+        ref={navRef}
+        style={{
+          background: 'rgba(30,41,59,0.5)',
+          padding: '10px 40px',
+          borderBottom: '1px solid rgba(100,116,139,0.2)',
+          overflowX: 'clip',
+          position: 'relative',
+        }}
+      >
+        <SoccerBall navRef={navRef} />
+        <div style={{ display: 'flex', gap: 4, maxWidth: 1600, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           {TABS.map(tab => (
             <button
               key={tab.id}
