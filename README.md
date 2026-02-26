@@ -245,6 +245,35 @@ Available in the **Scout** tab for any player in the dataset.
 
 ---
 
+### Value Predictor — Linear Baseline Model
+
+The **Value Predictor** tab includes a hand-crafted linear model alongside the neural network. This formula serves as an interpretable baseline and drives the **Value Breakdown waterfall chart**.
+
+**Formula:**
+
+```
+predicted_value = base + ratingBonus + potentialBonus − agePenalty − injuryPenalty + posBonus
+```
+
+| Factor | Calculation | Direction |
+|---|---|---|
+| **Base** | €20M | Always positive — league-average floor |
+| **Rating** | `(overall_rating − 60) × 1.5` | Positive if rated above 60, negative below |
+| **Potential** | `(potential_rating − 65) × 0.8` | Positive if potential > 65, negative below |
+| **Age Adj.** | `−(age − 28) × 3` for age > 28, else 0 | Always ≤ 0 (penalty begins at age 29) |
+| **Injury** | −€15M if injury prone | Always ≤ 0 |
+| **Position** | +€10M for ST, LW, RW; else 0 | Positive for attacking positions only |
+
+The final value is clamped between **€0.5M and €180M**.
+
+**Why €20M as the base?**
+It is an intentional anchor representing a "below-average but professional" player floor — someone rated 60 with average potential, no injury history, and a mid-table position still deserves a baseline market price. All other factors add or subtract from this starting point.
+
+**Reading the waterfall chart:**
+Each bar in the chart represents one factor's individual contribution. Green/blue bars push the value upward; **red bars are negative** — they actively reduce the final estimate. A player with a large red "Age Adj." bar, for example, is being penalized significantly for being past their peak years. The bars stack cumulatively left to right, ending at the linear model's final prediction.
+
+---
+
 ### Statistical Analysis
 
 Beyond ML models, the dashboard computes several classical statistics across filtered player subsets:
@@ -295,7 +324,7 @@ Players with 0–1 years left on their contracts are often priced at a discount 
 | **Overview** | KPI header cards, age distribution chart, transfer risk breakdown, club comparison bar chart |
 | **Market Analysis** | Rating vs value scatter plot, position-level bar chart, Pearson correlation heatmap, age trend line |
 | **ML Models** | Neural network training loss curve, regression metrics (RMSE, R², MAE), feature importance bar chart, transfer risk classifier accuracy and confusion matrix |
-| **Value Predictor** | Interactive form — enter age, rating, potential, position, injury status, contract years and get a live neural network prediction with percentile context |
+| **Value Predictor** | Interactive form — enter age, rating, potential, position, injury status, contract years and get both a linear model estimate and a live neural network prediction. Includes a waterfall chart breaking down each factor's contribution (base €20M + rating bonus + potential bonus − age penalty − injury penalty + position premium). Red bars in the chart indicate factors actively reducing the predicted value. |
 | **Comparison** | Side-by-side radar charts comparing up to 4 players across rating, potential, goals, assists, and market value |
 | **Clustering** | K-Means scatter plot (rating vs value, colored by cluster), cluster summary cards with average stats per tier |
 | **Insights** | Project objective summary, model performance cards, key findings, top 10 undervalued players table, actual vs predicted scatter plot, position mispricing chart |

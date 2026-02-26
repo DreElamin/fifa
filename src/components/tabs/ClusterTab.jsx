@@ -47,7 +47,7 @@ export default function ClusterTab({ filteredPlayers, kmeans, pcaData, clusterLa
       clusterName: kmeans ? kmeans.getClusterName(clusterLabels[i]) : CLUSTER_NAMES[clusterLabels[i]] ?? 'Unknown',
       name: p.name,
       overall: p.overall_rating,
-      value: p.market_value,
+      marketValue: p.market_value,
     }))
   }, [filteredPlayers, pcaData, clusterLabels, kmeans])
 
@@ -142,7 +142,7 @@ export default function ClusterTab({ filteredPlayers, kmeans, pcaData, clusterLa
                       Overall: {d.overall}
                     </p>
                     <p style={{ color: '#94a3b8', fontSize: 11, margin: 0 }}>
-                      Value: €{d.value}M
+                      Value: €{d.marketValue?.toFixed(1) ?? '—'}M
                     </p>
                   </div>
                 )

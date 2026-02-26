@@ -149,6 +149,17 @@ export class NeuralNetwork {
   }
 }
 
+// ─── Standardize feature matrix (z-score per column) ─────────────────────────
+const standardize = (data) => {
+  const d = data[0].length
+  const means = Array.from({ length: d }, (_, j) => mean(data.map(r => r[j])))
+  const stds  = Array.from({ length: d }, (_, j) => {
+    const s = std(data.map(r => r[j]))
+    return s > 1e-9 ? s : 1
+  })
+  return { means, stds, scaled: data.map(r => r.map((v, j) => (v - means[j]) / stds[j])) }
+}
+
 // ─── K-Means ──────────────────────────────────────────────────────────────────
 export class KMeans {
   constructor(k = 4) {
@@ -158,7 +169,8 @@ export class KMeans {
   }
 
   fit(players, maxIter = 50) {
-    const data = players.map(p => extractFeatures(p))
+    const raw = players.map(p => extractFeatures(p))
+    const { scaled: data } = standardize(raw)
 
     // K-means++ initialization
     this.centroids = [data[Math.floor(Math.random() * data.length)]]
@@ -200,17 +212,20 @@ export class KMeans {
 export class PCA {
   constructor() {
     this.mean = []
+    this.stds = []
     this.components = []
     this.varianceExplained = []
   }
 
   fit(players) {
-    const data = players.map(p => extractFeatures(p))
-    const n = data.length
-    const d = data[0].length
+    const raw = players.map(p => extractFeatures(p))
+    const n = raw.length
+    const d = raw[0].length
 
-    this.mean = data[0].map((_, j) => mean(data.map(r => r[j])))
-    const centered = data.map(r => r.map((v, j) => v - this.mean[j]))
+    const { means, stds, scaled: data } = standardize(raw)
+    this.mean = means
+    this.stds = stds
+    const centered = data  // already mean-0, std-1
 
     // Covariance matrix
     const cov = Array.from({ length: d }, (_, i) =>
@@ -246,7 +261,7 @@ export class PCA {
 
   transform(players) {
     return players.map(p => {
-      const x = extractFeatures(p).map((v, j) => v - this.mean[j])
+      const x = extractFeatures(p).map((v, j) => (v - this.mean[j]) / this.stds[j])
       return {
         pc1: dot(this.components[0].vector, x),
         pc2: dot(this.components[1].vector, x),

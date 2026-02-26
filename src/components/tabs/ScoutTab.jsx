@@ -82,7 +82,7 @@ function euclidean(a, b) {
   return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0))
 }
 
-function UndervaluedTable({ analyzedPlayers, onSelectPlayer }) {
+function UndervaluedTable({ analyzedPlayers, onSelectPlayer, selectedPlayer }) {
   const rows = useMemo(
     () =>
       analyzedPlayers
@@ -114,6 +114,10 @@ function UndervaluedTable({ analyzedPlayers, onSelectPlayer }) {
           <tbody>
             {rows.map((player, idx) => {
               const gap = (player.predictedValue - (player.market_value || 0)).toFixed(2)
+              const isSelected =
+                selectedPlayer &&
+                (selectedPlayer.name || selectedPlayer.short_name) ===
+                  (player.name || player.short_name)
               return (
                 <tr
                   key={idx}
@@ -121,13 +125,21 @@ function UndervaluedTable({ analyzedPlayers, onSelectPlayer }) {
                   style={{
                     cursor: 'pointer',
                     transition: 'background 0.15s',
+                    background: isSelected
+                      ? 'rgba(249,115,22,0.18)'
+                      : 'transparent',
+                    outline: isSelected ? '1px solid rgba(249,115,22,0.5)' : 'none',
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = 'rgba(249,115,22,0.07)')
-                  }
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) e.currentTarget.style.background = 'rgba(249,115,22,0.07)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = isSelected
+                      ? 'rgba(249,115,22,0.18)'
+                      : 'transparent'
+                  }}
                 >
-                  <td style={{ ...tdBase, color: '#f8fafc', fontWeight: 600 }}>
+                  <td style={{ ...tdBase, color: isSelected ? '#f97316' : '#f8fafc', fontWeight: 600 }}>
                     {player.name || player.short_name || '—'}
                   </td>
                   <td style={tdBase}>{player.club || player.club_name || '—'}</td>
@@ -151,7 +163,7 @@ function UndervaluedTable({ analyzedPlayers, onSelectPlayer }) {
   )
 }
 
-function OvervaluedTable({ analyzedPlayers, onSelectPlayer }) {
+function OvervaluedTable({ analyzedPlayers, onSelectPlayer, selectedPlayer }) {
   const rows = useMemo(
     () =>
       analyzedPlayers
@@ -183,17 +195,32 @@ function OvervaluedTable({ analyzedPlayers, onSelectPlayer }) {
           <tbody>
             {rows.map((player, idx) => {
               const gap = (player.predictedValue - (player.market_value || 0)).toFixed(2)
+              const isSelected =
+                selectedPlayer &&
+                (selectedPlayer.name || selectedPlayer.short_name) ===
+                  (player.name || player.short_name)
               return (
                 <tr
                   key={idx}
                   onClick={() => onSelectPlayer(player)}
-                  style={{ cursor: 'pointer', transition: 'background 0.15s' }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = 'rgba(239,68,68,0.07)')
-                  }
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  style={{
+                    cursor: 'pointer',
+                    transition: 'background 0.15s',
+                    background: isSelected
+                      ? 'rgba(239,68,68,0.18)'
+                      : 'transparent',
+                    outline: isSelected ? '1px solid rgba(239,68,68,0.5)' : 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) e.currentTarget.style.background = 'rgba(239,68,68,0.07)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = isSelected
+                      ? 'rgba(239,68,68,0.18)'
+                      : 'transparent'
+                  }}
                 >
-                  <td style={{ ...tdBase, color: '#f8fafc', fontWeight: 600 }}>
+                  <td style={{ ...tdBase, color: isSelected ? '#f87171' : '#f8fafc', fontWeight: 600 }}>
                     {player.name || player.short_name || '—'}
                   </td>
                   <td style={tdBase}>{player.club || player.club_name || '—'}</td>
@@ -552,8 +579,8 @@ export default function ScoutTab({ analyzedPlayers, allPlayers, pcaData, cluster
           </button>
         </div>
       )}
-      <UndervaluedTable analyzedPlayers={analyzedPlayers} onSelectPlayer={setSelectedPlayer} />
-      <OvervaluedTable analyzedPlayers={analyzedPlayers} onSelectPlayer={setSelectedPlayer} />
+      <UndervaluedTable analyzedPlayers={analyzedPlayers} onSelectPlayer={setSelectedPlayer} selectedPlayer={selectedPlayer} />
+      <OvervaluedTable analyzedPlayers={analyzedPlayers} onSelectPlayer={setSelectedPlayer} selectedPlayer={selectedPlayer} />
       <SimilaritySearch
         allPlayers={allPlayers}
         initialPlayer={selectedPlayer}

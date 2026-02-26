@@ -6,6 +6,7 @@ import {
   Scatter,
   XAxis,
   YAxis,
+  ZAxis,
   CartesianGrid,
   Tooltip,
   Legend,
@@ -52,13 +53,27 @@ function ScatterTooltip({ active, payload }) {
         Age: {d.age}
       </p>
       <p style={{ color: colors.info, fontSize: 13, fontWeight: 600 }}>
-        Value: €{(d.market_value / 1e6).toFixed(1)}M
+        Value: €{d.market_value.toFixed(1)}M
       </p>
       <p style={{ color: colors.success, fontSize: 13, fontWeight: 600 }}>
         Rating: {d.overall_rating}
       </p>
     </div>
   )
+}
+
+// Rating tiers for bubble colour
+const RATING_TIERS = [
+  { label: '90+',   min: 90, color: '#ef4444' },
+  { label: '80–89', min: 80, color: '#f97316' },
+  { label: '70–79', min: 70, color: '#eab308' },
+  { label: '<70',   min: 0,  color: '#3b82f6' },
+]
+function ratingColor(r) {
+  if (r >= 90) return '#ef4444'
+  if (r >= 80) return '#f97316'
+  if (r >= 70) return '#eab308'
+  return '#3b82f6'
 }
 
 function correlationColor(r) {
@@ -118,46 +133,59 @@ export default function MarketAnalysisTab({ filteredPlayers, analytics }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
         {/* Scatter Chart: Age vs Market Value */}
         <div style={sectionStyle}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <p style={{ ...sectionTitleStyle, margin: 0 }}>Value vs Age (bubble size = rating)</p>
-            <InfoIcon text="Each dot is a player. X-axis is age, Y-axis is market value. Reveals the typical career earnings curve and highlights outliers who are unusually valuable or cheap for their age. Hover a point for details." />
+            <InfoIcon text="Each bubble is a player. X-axis is age, Y-axis is market value. Bubble size and colour both reflect overall rating — bigger/redder = higher rated. The inverted-U shape shows the career peak value curve (ages 24–29). Hover a bubble for details." />
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+          {/* Rating colour legend */}
+          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 12 }}>
+            {RATING_TIERS.map((t) => (
+              <div key={t.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', background: t.color, opacity: 0.85 }} />
+                <span style={{ color: '#94a3b8', fontSize: 11 }}>{t.label}</span>
+              </div>
+            ))}
+          </div>
+          <ResponsiveContainer width="100%" height={290}>
+            <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 16 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,116,139,0.15)" />
               <XAxis
                 type="number"
                 dataKey="age"
                 name="Age"
-                domain={['auto', 'auto']}
+                domain={[16, 40]}
+                ticks={[17, 20, 23, 26, 29, 32, 35, 38]}
                 tick={{ fill: '#94a3b8', fontSize: 11 }}
                 axisLine={{ stroke: 'rgba(100,116,139,0.3)' }}
                 tickLine={false}
-                label={{
-                  value: 'Age',
-                  position: 'insideBottom',
-                  offset: -2,
-                  fill: '#94a3b8',
-                  fontSize: 11,
-                }}
+                label={{ value: 'Age', position: 'insideBottom', offset: -8, fill: '#94a3b8', fontSize: 11 }}
               />
               <YAxis
                 type="number"
                 dataKey="market_value"
                 name="Market Value"
+                domain={[0, 'auto']}
                 tick={{ fill: '#94a3b8', fontSize: 11 }}
                 axisLine={{ stroke: 'rgba(100,116,139,0.3)' }}
                 tickLine={false}
                 tickFormatter={(v) => `€${v.toFixed(0)}M`}
+                width={52}
               />
+              {/* ZAxis maps the z field (derived from rating) to bubble area */}
+              <ZAxis dataKey="z" range={[20, 280]} />
               <Tooltip content={<ScatterTooltip />} />
-              <Scatter
-                data={scatterData}
-                fill={colors.accent}
-                fillOpacity={0.6}
-                stroke={colors.accent}
-                strokeWidth={0.5}
-              />
+              <Scatter data={scatterData} isAnimationActive={false}>
+                {scatterData.map((entry, i) => (
+                  <Cell
+                    key={i}
+                    fill={ratingColor(entry.overall_rating)}
+                    fillOpacity={0.55}
+                    stroke={ratingColor(entry.overall_rating)}
+                    strokeWidth={0.5}
+                    strokeOpacity={0.7}
+                  />
+                ))}
+              </Scatter>
             </ScatterChart>
           </ResponsiveContainer>
         </div>

@@ -16,7 +16,7 @@ import {
 import StatCard from '../../components/common/StatCard.jsx'
 import CustomTooltip from '../../components/common/CustomTooltip.jsx'
 import InfoIcon from '../../components/common/InfoIcon.jsx'
-import { colors } from '../../colors.js'
+import { colors, CHART_COLORS } from '../../colors.js'
 import { mean, percentile } from '../../utils/stats.js'
 import _ from 'lodash'
 
@@ -204,7 +204,7 @@ export default function OverviewTab({ filteredPlayers, analytics, animatedValue 
                 {top8Clubs.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={colors.clubs[entry.club] || colors.accent}
+                    fill={CHART_COLORS[index % CHART_COLORS.length]}
                   />
                 ))}
               </Bar>

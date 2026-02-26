@@ -160,7 +160,11 @@ export default function PredictorTab({ nn }) {
             borderRadius: 10,
             padding: 24,
             textAlign: 'center',
+            position: 'relative',
           }}>
+            <div style={{ position: 'absolute', top: 8, right: 8 }}>
+              <InfoIcon text="Formula-based estimate built from 6 additive factors. Starts at a €20M base (league-average floor), then adds or subtracts: Rating bonus = (overall − 60) × 1.5, Potential bonus = (potential − 65) × 0.8, Age penalty = −€3M per year over 28, Injury penalty = −€15M if injury prone, Position premium = +€10M for ST/LW/RW. Negative bars in the breakdown chart show factors actively reducing the value." />
+            </div>
             <div style={{ color: '#94a3b8', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
               Linear Model
             </div>
@@ -177,7 +181,11 @@ export default function PredictorTab({ nn }) {
             borderRadius: 10,
             padding: 24,
             textAlign: 'center',
+            position: 'relative',
           }}>
+            <div style={{ position: 'absolute', top: 8, right: 8 }}>
+              <InfoIcon text="Neural network prediction trained on 2,800 real players. Uses a 3-layer MLP (6 inputs → 16 → 8 → 1 output) to learn non-linear relationships the linear formula cannot capture — for example, how age and rating interact differently for a GK vs a ST. The difference shown below compares it against the linear estimate." />
+            </div>
             <div style={{ color: '#94a3b8', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
               AI Prediction
             </div>

@@ -17,7 +17,7 @@ export const colors = {
   clubs: {
     'Liverpool': '#ef4444',
     'FC Barcelona': '#3b82f6',
-    'Juventus': '#1e293b',
+    'Juventus': '#e2e8f0',
     'Manchester City': '#60a5fa',
     'PSG': '#1d4ed8',
     'Bayern Munich': '#dc2626',
@@ -29,7 +29,7 @@ export const colors = {
     'Borussia Dortmund': '#eab308',
     'Inter Milan': '#1d4ed8',
     'AC Milan': '#dc2626',
-    'Tottenham': '#1e293b',
+    'Tottenham': '#a78bfa',
   },
   positions: {
     'ST': '#ef4444',
