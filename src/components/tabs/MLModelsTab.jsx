@@ -1,4 +1,5 @@
 import React from 'react'
+import InfoIcon from '../../components/common/InfoIcon.jsx'
 import {
   LineChart,
   Line,
@@ -60,7 +61,10 @@ function MetricCard({ label, value, unit }) {
 function NeuralNetworkSection({ lossHistory, metrics }) {
   return (
     <div style={sectionStyle}>
-      <h3 style={sectionTitleStyle}>Neural Network — Market Value Regression</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Neural Network — Market Value Regression</h3>
+        <InfoIcon text="Performance metrics and training loss curve for the 3-layer MLP (6→16→8→1). The curve shows how the model's mean-squared error decreases across 120 epochs, confirming it learned to predict market value from player stats." />
+      </div>
       <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
         <MetricCard label="RMSE" value={metrics.rmse} unit="€M" />
         <MetricCard label="R² Score" value={metrics.r2} unit="" />
@@ -110,7 +114,10 @@ function NeuralNetworkSection({ lossHistory, metrics }) {
 function FeatureImportanceSection({ featureImportance }) {
   return (
     <div style={sectionStyle}>
-      <h3 style={sectionTitleStyle}>Feature Importance (Permutation)</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Feature Importance (Permutation)</h3>
+        <InfoIcon text="Each feature's score shows how much the neural network's prediction error increases when that feature's values are randomly shuffled. A higher score means the model relies on that feature more heavily." />
+      </div>
       <ResponsiveContainer width="100%" height={Math.max(200, featureImportance.length * 36)}>
         <BarChart
           data={featureImportance}
@@ -277,7 +284,10 @@ function TransferRiskSection({ classifier }) {
 
   return (
     <div style={sectionStyle}>
-      <h3 style={sectionTitleStyle}>Transfer Risk Classifier (Logistic Regression)</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Transfer Risk Classifier (Logistic Regression)</h3>
+        <InfoIcon text="Accuracy and confusion matrix for the logistic regression classifier predicting transfer risk (Low / Medium / High). Green diagonal cells are correct predictions; red off-diagonal cells are misclassifications." />
+      </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 20 }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Accuracy</div>
@@ -349,7 +359,10 @@ function ModelComparisonSection({ metrics }) {
 
   return (
     <div style={sectionStyle}>
-      <h3 style={sectionTitleStyle}>Model Comparison</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Model Comparison</h3>
+        <InfoIcon text="Side-by-side comparison of three regression approaches on the same dataset: a simple linear formula, the trained neural network (MLP), and a k-NN model. Lower RMSE and higher R² indicate a better fit." />
+      </div>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>

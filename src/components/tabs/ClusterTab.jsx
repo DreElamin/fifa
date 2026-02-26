@@ -10,6 +10,7 @@ import {
   Cell,
 } from 'recharts'
 import { colors } from '../../colors.js'
+import InfoIcon from '../../components/common/InfoIcon.jsx'
 import _ from 'lodash'
 
 const sectionStyle = {
@@ -76,9 +77,12 @@ export default function ClusterTab({ filteredPlayers, kmeans, pcaData, clusterLa
       <div style={sectionStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
           <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Player Clusters (K-Means, k=4)</h3>
-          <span style={{ color: '#64748b', fontSize: 11, marginTop: 2 }}>
-            Positioned using PCA — 2 principal components
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ color: '#64748b', fontSize: 11, marginTop: 2 }}>
+              Positioned using PCA — 2 principal components
+            </span>
+            <InfoIcon text="2D scatter plot of all players positioned using the first two principal components (PCA). Colours represent the 4 K-Means clusters. Players close together share similar stat profiles." />
+          </div>
         </div>
 
         {/* Legend */}
@@ -163,7 +167,10 @@ export default function ClusterTab({ filteredPlayers, kmeans, pcaData, clusterLa
 
       {/* Cluster Statistics Cards */}
       <div style={sectionStyle}>
-        <h3 style={sectionTitleStyle}>Cluster Statistics</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Cluster Statistics</h3>
+          <InfoIcon text="Summary cards for each of the 4 K-Means player clusters: Elite, Star, Regular, and Prospect. Shows the number of players in each group along with their average market value and overall rating." />
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
           {clusterStats.map((cs) => (
             <div
@@ -210,7 +217,10 @@ export default function ClusterTab({ filteredPlayers, kmeans, pcaData, clusterLa
 
       {/* Cluster Insights Table */}
       <div style={sectionStyle}>
-        <h3 style={sectionTitleStyle}>Cluster Insights</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Cluster Insights</h3>
+          <InfoIcon text="Detailed breakdown per cluster showing player count, average market value, average rating, average age, and the most common position. Helps characterise what each cluster represents in football terms." />
+        </div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>

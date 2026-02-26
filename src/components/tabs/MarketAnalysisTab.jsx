@@ -14,6 +14,7 @@ import {
   Cell,
 } from 'recharts'
 import CustomTooltip from '../../components/common/CustomTooltip.jsx'
+import InfoIcon from '../../components/common/InfoIcon.jsx'
 import { colors } from '../../colors.js'
 import { mean } from '../../utils/stats.js'
 
@@ -117,7 +118,10 @@ export default function MarketAnalysisTab({ filteredPlayers, analytics }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
         {/* Scatter Chart: Age vs Market Value */}
         <div style={sectionStyle}>
-          <p style={sectionTitleStyle}>Value vs Age (bubble size = rating)</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <p style={{ ...sectionTitleStyle, margin: 0 }}>Value vs Age (bubble size = rating)</p>
+            <InfoIcon text="Each dot is a player. X-axis is age, Y-axis is market value. Reveals the typical career earnings curve and highlights outliers who are unusually valuable or cheap for their age. Hover a point for details." />
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,116,139,0.15)" />
@@ -160,7 +164,10 @@ export default function MarketAnalysisTab({ filteredPlayers, analytics }) {
 
         {/* Bar Chart: Position vs Avg Value */}
         <div style={sectionStyle}>
-          <p style={sectionTitleStyle}>Avg Value by Position</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <p style={{ ...sectionTitleStyle, margin: 0 }}>Avg Value by Position</p>
+            <InfoIcon text="Bar chart comparing the average market value across player positions. Attackers (ST, LW, RW) typically command the highest premiums. Each bar is colour-coded by position." />
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart
               data={positionAnalysis}
@@ -195,7 +202,10 @@ export default function MarketAnalysisTab({ filteredPlayers, analytics }) {
 
       {/* Position Performance Table */}
       <div style={sectionStyle}>
-        <p style={sectionTitleStyle}>Position Performance</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <p style={{ ...sectionTitleStyle, margin: 0 }}>Position Performance</p>
+          <InfoIcon text="Per-position averages: number of players, average market value, goals per match, and assists per match. Useful for understanding productivity and value differences across roles." />
+        </div>
         <div style={{ overflowX: 'auto' }}>
           <table
             style={{
@@ -310,7 +320,10 @@ export default function MarketAnalysisTab({ filteredPlayers, analytics }) {
 
       {/* Correlation Heatmap */}
       <div style={sectionStyle}>
-        <p style={sectionTitleStyle}>Feature Correlation Heatmap</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <p style={{ ...sectionTitleStyle, margin: 0 }}>Feature Correlation Heatmap</p>
+          <InfoIcon text="Heatmap of Pearson correlation coefficients between pairs of numerical features. Warm colours indicate positive correlation, cool colours negative. Strong correlations reveal features that move together." />
+        </div>
         <HeatmapChart players={filteredPlayers} />
       </div>
 

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import SliderInput from '../../components/common/SliderInput.jsx'
 import FilterSelect from '../../components/common/FilterSelect.jsx'
 import WaterfallChart from '../../components/charts/WaterfallChart.jsx'
+import InfoIcon from '../../components/common/InfoIcon.jsx'
 
 const sectionStyle = {
   background: 'rgba(30,41,59,0.6)',
@@ -202,7 +203,10 @@ export default function PredictorTab({ nn }) {
 
       {/* Value Breakdown Waterfall */}
       <div style={sectionStyle}>
-        <h3 style={sectionTitleStyle}>Value Breakdown</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Value Breakdown</h3>
+          <InfoIcon text="Waterfall chart showing how each factor contributes to the linear model's final value estimate. Each bar adds or subtracts from the running total, building up from the base value to the final predicted price." />
+        </div>
         <WaterfallChart factors={factors} />
         <div style={{
           display: 'flex',

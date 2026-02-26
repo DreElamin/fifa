@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react'
+import InfoIcon from '../../components/common/InfoIcon.jsx'
 import {
   ScatterChart,
   Scatter,
@@ -93,7 +94,10 @@ function UndervaluedTable({ analyzedPlayers, onSelectPlayer }) {
 
   return (
     <div style={sectionStyle}>
-      <h3 style={sectionTitleStyle}>Undervalued Players (Model predicts higher value)</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Undervalued Players (Model predicts higher value)</h3>
+        <InfoIcon text="Top 15 players whose actual market value is significantly below the neural network's prediction (z-score < −0.5). A large gap suggests the market has underpriced their talent. Click a row to explore similar players." />
+      </div>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
@@ -159,7 +163,10 @@ function OvervaluedTable({ analyzedPlayers, onSelectPlayer }) {
 
   return (
     <div style={sectionStyle}>
-      <h3 style={sectionTitleStyle}>Overvalued Players (Actual value exceeds model prediction)</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Overvalued Players (Actual value exceeds model prediction)</h3>
+        <InfoIcon text="Top 15 players whose actual market value is significantly above the neural network's prediction (z-score > 0.5). The market may be pricing in hype, brand value, or factors not captured in the stats." />
+      </div>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
@@ -254,7 +261,10 @@ function SimilaritySearch({ allPlayers }) {
 
   return (
     <div style={sectionStyle}>
-      <h3 style={sectionTitleStyle}>Find Similar Players</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Find Similar Players</h3>
+        <InfoIcon text="Select a player to find the 5 most statistically similar players using Euclidean distance across 6 normalised features: age, overall rating, potential, goals, assists, and market value." />
+      </div>
       <div style={{ marginBottom: 20 }}>
         <label style={{ fontSize: 13, color: '#94a3b8', display: 'block', marginBottom: 8 }}>
           Select a player:
@@ -437,7 +447,10 @@ function PCAMap({ allPlayers, pcaData, clusterLabels }) {
 
   return (
     <div style={sectionStyle}>
-      <h3 style={sectionTitleStyle}>PCA Player Map (2D projection of all stats)</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h3 style={{ ...sectionTitleStyle, margin: 0 }}>PCA Player Map (2D projection of all stats)</h3>
+        <InfoIcon text="All 500 players projected onto the first two principal components. Each dot is a player colour-coded by K-Means cluster. Players in the same region share similar overall stat profiles." />
+      </div>
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 16 }}>
         {Object.entries(CLUSTER_LABELS).map(([key, label]) => (
           <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

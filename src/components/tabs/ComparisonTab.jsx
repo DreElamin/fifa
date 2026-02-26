@@ -10,6 +10,7 @@ import {
   Legend,
 } from 'recharts'
 import { colors, CHART_COLORS } from '../../colors.js'
+import InfoIcon from '../../components/common/InfoIcon.jsx'
 
 const sectionStyle = {
   background: 'rgba(30,41,59,0.6)',
@@ -153,7 +154,10 @@ export default function ComparisonTab({ filteredPlayers }) {
 
       {/* Radar Chart */}
       <div style={sectionStyle}>
-        <h3 style={sectionTitleStyle}>Performance Radar</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Performance Radar</h3>
+          <InfoIcon text="Radar chart overlaying up to 4 selected players across 5 metrics: overall rating, potential, goals, assists, and matches played (each scaled to 0–100). A larger area indicates a stronger all-round profile." />
+        </div>
         {selectedPlayers.length > 0 ? (
           <ResponsiveContainer width="100%" height={340}>
             <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
@@ -310,7 +314,10 @@ export default function ComparisonTab({ filteredPlayers }) {
 
       {/* Parallel Coordinates — all filtered players */}
       <div style={sectionStyle}>
-        <h3 style={{ ...sectionTitleStyle, margin: '0 0 16px 0' }}>Parallel Coordinates — All Players</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Parallel Coordinates — All Players</h3>
+          <InfoIcon text="Multi-axis chart where each vertical axis is a stat (age, rating, potential, goals, assists, value). Each line is a player, coloured by position. Parallel lines reveal patterns; crossing lines reveal trade-offs between attributes." />
+        </div>
         <p style={{ color: '#64748b', fontSize: 12, margin: '0 0 12px 0' }}>
           Each line is a player coloured by position. Hover to highlight.
         </p>

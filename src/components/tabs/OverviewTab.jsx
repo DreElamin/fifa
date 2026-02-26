@@ -15,6 +15,7 @@ import {
 } from 'recharts'
 import StatCard from '../../components/common/StatCard.jsx'
 import CustomTooltip from '../../components/common/CustomTooltip.jsx'
+import InfoIcon from '../../components/common/InfoIcon.jsx'
 import { colors } from '../../colors.js'
 import { mean, percentile } from '../../utils/stats.js'
 import _ from 'lodash'
@@ -101,7 +102,10 @@ export default function OverviewTab({ filteredPlayers, analytics, animatedValue 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
         {/* Age Group Composed Chart */}
         <div style={sectionStyle}>
-          <p style={sectionTitleStyle}>Value by Age Group</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <p style={{ ...sectionTitleStyle, margin: 0 }}>Value by Age Group</p>
+            <InfoIcon text="Average market value (shaded area, left axis) and average overall rating (line, right axis) grouped into 5-year age bands. Reveals how player value peaks in the mid-to-late 20s then declines with age." />
+          </div>
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart
               data={ageDistribution}
@@ -165,7 +169,10 @@ export default function OverviewTab({ filteredPlayers, analytics, animatedValue 
 
         {/* Top Clubs Horizontal Bar Chart */}
         <div style={sectionStyle}>
-          <p style={sectionTitleStyle}>Top Clubs by Avg Value</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <p style={{ ...sectionTitleStyle, margin: 0 }}>Top Clubs by Avg Value</p>
+            <InfoIcon text="Horizontal bar chart ranking the top 8 clubs by the average market value of their players. Each bar is colour-coded by club, making it easy to compare squad wealth at a glance." />
+          </div>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart
               data={top8Clubs}
@@ -208,7 +215,10 @@ export default function OverviewTab({ filteredPlayers, analytics, animatedValue 
 
       {/* Transfer Risk Distribution */}
       <div style={sectionStyle}>
-        <p style={sectionTitleStyle}>Transfer Risk Distribution</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <p style={{ ...sectionTitleStyle, margin: 0 }}>Transfer Risk Distribution</p>
+          <InfoIcon text="Breakdown of players in the current filter into Low, Medium, and High transfer risk categories, as classified by the logistic regression model. Percentages are relative to the filtered total." />
+        </div>
         <div
           style={{
             display: 'grid',

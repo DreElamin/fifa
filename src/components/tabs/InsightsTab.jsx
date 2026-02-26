@@ -15,6 +15,7 @@ import {
 } from 'recharts'
 import _ from 'lodash'
 import { colors } from '../../colors.js'
+import InfoIcon from '../../components/common/InfoIcon.jsx'
 
 // ---------------------------------------------------------------------------
 // Shared styles
@@ -553,7 +554,10 @@ function ScatterSection({ analyzedPlayers }) {
 
   return (
     <div style={sectionStyle}>
-      <h3 style={sectionTitleStyle}>Actual vs Predicted Market Value</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Actual vs Predicted Market Value</h3>
+        <InfoIcon text="Each point is a player. X-axis = actual market value, Y-axis = neural network prediction. Points on the dashed diagonal are perfectly predicted. Green dots are undervalued by the market; red dots are overvalued." />
+      </div>
 
       {/* Legend */}
       <div style={{ display: 'flex', gap: 20, marginBottom: 16 }}>
@@ -704,7 +708,10 @@ function PositionValueSection({ analyzedPlayers }) {
 
   return (
     <div style={sectionStyle}>
-      <h3 style={sectionTitleStyle}>Which Positions Are Systematically Mispriced?</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Which Positions Are Systematically Mispriced?</h3>
+        <InfoIcon text="Average valuation gap (predicted minus actual) per position. Green bars mean the market tends to undervalue that position on average; red bars mean it tends to overpay. Sorted from most undervalued to most overvalued." />
+      </div>
       <p
         style={{
           fontSize: 13,
