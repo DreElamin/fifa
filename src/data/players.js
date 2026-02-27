@@ -36,6 +36,38 @@ function computeAssists(overall_rating, position, matches_played, id) {
   return Math.max(0, Math.round(rawAssists * noise))
 }
 
+// Compute transfer risk from player attributes.
+// Contract years left is the dominant driver; age, rating, potential gap,
+// and injury history add secondary signals.
+function computeTransferRisk(age, overall_rating, potential_rating, contract_years_left, injury_prone, id) {
+  // Contract expiry is the #1 risk signal (0 yr = 100 pts, 5 yr = 0 pts)
+  let score = (5 - Math.min(contract_years_left, 5)) * 18
+
+  // Elite players are always transfer targets regardless of contract
+  if (overall_rating >= 87) score += 22
+  else if (overall_rating >= 82) score += 12
+  else if (overall_rating >= 77) score += 5
+
+  // Veteran players (32+) face sell-on pressure
+  if (age >= 35) score += 18
+  else if (age >= 32) score += 10
+
+  // Young high-potential talents are coveted (buying clubs pay premiums)
+  const potGap = Math.max(0, potential_rating - overall_rating)
+  if (age <= 22 && potGap >= 10) score += 18
+  else if (age <= 25 && potGap >= 8) score += 10
+
+  // Injury-prone players are offloaded more often
+  if (injury_prone === 'Yes') score += 8
+
+  // Deterministic per-player noise (±12 pts) so not every player is identical
+  score += (seededRand(id * 23 + 11) * 24) - 12
+
+  if (score >= 88) return 'High'
+  if (score >= 50) return 'Medium'
+  return 'Low'
+}
+
 // Derive a realistic market_value (€M) from player attributes.
 // Overall rating is the dominant driver; age peaks at ~26; high potential on
 // young players adds a premium; short contracts and injury-prone reduce value.
@@ -91,6 +123,6 @@ export const players = rows.slice(1).map(line => {
     market_value:        computeMarketValue(age, overall_rating, potential_rating, contract_years_left, injury_prone, id),
     contract_years_left,
     injury_prone,
-    transfer_risk:        cols[15].trim(),
+    transfer_risk:        computeTransferRisk(age, overall_rating, potential_rating, contract_years_left, injury_prone, id),
   }
 })

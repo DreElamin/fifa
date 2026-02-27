@@ -344,13 +344,26 @@ export const computeFeatureImportance = (nn, players) => {
 }
 
 // ─── Transfer Risk Classifier (Logistic Regression) ───────────────────────────
+// Uses its own feature set tuned to transfer-risk signals, plus z-score
+// standardisation for stable gradient descent.
+const extractTransferFeatures = (player) => [
+  player.age / 39,
+  player.overall_rating / 100,
+  player.potential_rating / 100,
+  player.contract_years_left / 5,
+  player.injury_prone === 'Yes' ? 1 : 0,
+  Math.max(0, (player.potential_rating - player.overall_rating)) / 30,
+]
+
 export class TransferRiskClassifier {
   constructor() {
-    this.weights = Array(6).fill(0)
+    this.weights = []
     this.bias = [0, 0, 0]
     this.classes = ['Low', 'Medium', 'High']
     this.accuracy = 0
     this.confusionMatrix = [[0,0,0],[0,0,0],[0,0,0]]
+    this._means = []
+    this._stds  = []
   }
 
   _softmax(logits) {
@@ -361,35 +374,51 @@ export class TransferRiskClassifier {
   }
 
   _forward(x) {
+    const nFeat = x.length
     return this.classes.map((_, k) =>
-      x.reduce((s, v, j) => s + this.weights[k * 6 + j] * v, 0) + this.bias[k]
+      x.reduce((s, v, j) => s + this.weights[k * nFeat + j] * v, 0) + this.bias[k]
     )
   }
 
-  train(players, epochs = 200, lr = 0.05) {
-    const nClasses = 3
-    this.weights = Array(nClasses * 6).fill(0).map(() => (Math.random() - 0.5) * 0.1)
-    this.bias = Array(nClasses).fill(0)
+  _standardize(x) {
+    return x.map((v, j) => this._stds[j] > 1e-9 ? (v - this._means[j]) / this._stds[j] : 0)
+  }
 
-    const data = players.map(p => ({
-      x: extractFeatures(p),
+  train(players, epochs = 300, lr = 0.03) {
+    const nClasses = 3
+    const raw = players.map(p => ({
+      x: extractTransferFeatures(p),
       y: this.classes.indexOf(p.transfer_risk),
     })).filter(d => d.y >= 0)
 
+    if (raw.length === 0) return
+
+    const nFeat = raw[0].x.length
+
+    // Z-score standardise feature columns
+    const { means, stds, scaled } = standardize(raw.map(d => d.x))
+    this._means = means
+    this._stds  = stds
+    const data = raw.map((d, i) => ({ x: scaled[i], y: d.y }))
+
+    // He initialisation
+    this.weights = Array(nClasses * nFeat).fill(0).map(() => (Math.random() - 0.5) * Math.sqrt(2 / nFeat))
+    this.bias    = Array(nClasses).fill(0)
+
     for (let ep = 0; ep < epochs; ep++) {
-      const shuffled = shuffle(data)
-      for (const { x, y } of shuffled) {
-        const logits = this._forward(x)
-        const probs = this._softmax(logits)
+      // Learning-rate decay for smoother convergence in later epochs
+      const lrEp = lr / (1 + ep * 0.005)
+      for (const { x, y } of shuffle(data)) {
+        const probs   = this._softmax(this._forward(x))
         const dLogits = probs.map((p, k) => p - (k === y ? 1 : 0))
         dLogits.forEach((dl, k) => {
-          x.forEach((xj, j) => { this.weights[k * 6 + j] -= lr * dl * xj })
-          this.bias[k] -= lr * dl
+          x.forEach((xj, j) => { this.weights[k * nFeat + j] -= lrEp * dl * xj })
+          this.bias[k] -= lrEp * dl
         })
       }
     }
 
-    // Evaluate
+    // Evaluate on training data
     let correct = 0
     const cm = Array.from({ length: 3 }, () => Array(3).fill(0))
     for (const { x, y } of data) {
@@ -397,21 +426,21 @@ export class TransferRiskClassifier {
       if (pred === y) correct++
       cm[y][pred]++
     }
-    this.accuracy = +(correct / data.length * 100).toFixed(1)
+    this.accuracy       = +(correct / data.length * 100).toFixed(1)
     this.confusionMatrix = cm
   }
 
   predict(player) {
-    const x = extractFeatures(player)
+    const x    = this._standardize(extractTransferFeatures(player))
     const probs = this._softmax(this._forward(x))
     return { label: this.classes[argmax(probs)], probs }
   }
 
   getMetrics() {
     return {
-      accuracy: this.accuracy,
+      accuracy:        this.accuracy,
       confusionMatrix: this.confusionMatrix,
-      classes: this.classes,
+      classes:         this.classes,
     }
   }
 }
