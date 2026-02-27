@@ -104,7 +104,7 @@ export default function OverviewTab({ filteredPlayers, analytics, animatedValue 
         <div style={sectionStyle}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <p style={{ ...sectionTitleStyle, margin: 0 }}>Value by Age Group</p>
-            <InfoIcon text="Average market value (shaded area, left axis) and average overall rating (line, right axis) grouped into 5-year age bands. Reveals how player value peaks in the mid-to-late 20s then declines with age." />
+            <InfoIcon text="Average market value (shaded area, left axis) and average overall rating (line, right axis) grouped into 5-year age bands. Market value peaks around the 24–27 age band reflecting prime career years, then declines as the age penalty in the valuation formula increases. Average rating does shift across age groups — older age bands tend to have slightly higher ratings as lower-rated players exit the league." />
           </div>
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart
@@ -138,7 +138,8 @@ export default function OverviewTab({ filteredPlayers, analytics, animatedValue 
                 tick={{ fill: '#94a3b8', fontSize: 11 }}
                 axisLine={{ stroke: 'rgba(100,116,139,0.3)' }}
                 tickLine={false}
-                domain={[60, 90]}
+                domain={['dataMin - 2', 'dataMax + 2']}
+                tickCount={5}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend

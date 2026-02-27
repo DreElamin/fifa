@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, Fragment } from 'react'
 import { correlation } from '../../utils/stats.js'
 
 const FIELDS = [
@@ -54,8 +54,8 @@ export default function HeatmapChart({ players }) {
 
         {/* Rows */}
         {FIELDS.map((rowF, i) => (
-          <>
-            <div key={rowF.key} style={{
+          <Fragment key={rowF.key}>
+            <div style={{
               display: 'flex', alignItems: 'center',
               color: '#94a3b8', fontSize: 11, fontWeight: 600,
               paddingRight: 8, borderRight: '1px solid rgba(100,116,139,0.2)',
@@ -83,7 +83,7 @@ export default function HeatmapChart({ players }) {
                 </div>
               )
             })}
-          </>
+          </Fragment>
         ))}
       </div>
 

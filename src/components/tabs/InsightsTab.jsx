@@ -114,7 +114,7 @@ function ProjectObjectiveSection() {
             maxWidth: 820,
           }}
         >
-          We train a neural network on 500 player records to predict market value from
+          We train a neural network on all 2,800 synthetic player records to predict market value from
           performance stats, then surface players whose actual price is significantly below
           the model's prediction.
         </p>
@@ -123,15 +123,15 @@ function ProjectObjectiveSection() {
           {[
             {
               dot: '#f97316',
-              text: 'A 3-layer MLP is trained on features such as overall rating, age, position, and potential to learn what a "fair" market value looks like for any given player profile.',
+              text: 'A 3-layer MLP (6→16→8→1) is trained on features such as overall rating, age, position, and potential. Because the dataset is synthetically generated, features are statistically independent and the model converges toward the global mean.',
             },
             {
               dot: '#22c55e',
-              text: 'Once the model is trained, we run every player through it and compute the residual — the difference between the predicted price and the real transfer fee on record.',
+              text: 'Once the model is trained, every player is scored and a residual is computed — the difference between the neural network\'s prediction and the player\'s actual recorded value.',
             },
             {
               dot: '#3b82f6',
-              text: 'Players with a large negative residual (actual price well below prediction) are flagged as undervalued targets — hidden gems that the market has not yet priced correctly.',
+              text: 'Players with the largest negative residuals (actual value well below the model\'s prediction) are surfaced as potential undervalued targets. With synthetic data these are statistical outliers rather than genuine market inefficiencies.',
             },
           ].map(({ dot, text }, i) => (
             <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
@@ -223,8 +223,8 @@ const KEY_FINDINGS = [
     borderColor: 'rgba(249,115,22,0.5)',
     gradientFrom: 'rgba(249,115,22,0.10)',
     gradientTo: 'rgba(249,115,22,0.02)',
-    title: 'Overall Rating is the Strongest Predictor',
-    body: 'Top feature driving market value predictions. A 10-point rating increase correlates with roughly €15–25M in additional value, making it the single most impactful variable in the model.',
+    title: 'Derived Market Values — Real Feature Correlations',
+    body: 'Market value is computed from overall rating, age, potential, contract length, and injury status — not assigned randomly. This means Rating↔Value and Potential↔Value show strong positive correlations, and Age↔Value shows a moderate relationship. Goals and Assists come directly from the raw CSV and correlate weakly with other features.',
   },
   {
     icon: '▲',
@@ -232,8 +232,8 @@ const KEY_FINDINGS = [
     borderColor: 'rgba(34,197,94,0.5)',
     gradientFrom: 'rgba(34,197,94,0.10)',
     gradientTo: 'rgba(34,197,94,0.02)',
-    title: 'Age Peaks at 24–29',
-    body: 'Players in this age band command the highest market values. After 29, value declines roughly 8% per year on average as the remaining years at peak performance shrink.',
+    title: 'Flat Age–Value Distribution',
+    body: 'Average market value is roughly €90M across every 5-year age band (ages 17–39). There is no career-peak curve in this dataset — all age groups are drawn from the same uniform distribution.',
   },
   {
     icon: '⚡',
@@ -241,8 +241,8 @@ const KEY_FINDINGS = [
     borderColor: 'rgba(59,130,246,0.5)',
     gradientFrom: 'rgba(59,130,246,0.10)',
     gradientTo: 'rgba(59,130,246,0.02)',
-    title: 'Attackers Are Worth More',
-    body: 'ST/LW/RW positions command a 30% premium over defensive positions at equivalent overall ratings. Goal-scoring output is priced at a significant premium by the transfer market.',
+    title: 'Uniform Position Value',
+    body: 'All nine positions (GK, CB, LB, RB, CDM, CM, LW, RW, ST) have average values between €87M and €94M. Any differences are within random noise — no position commands a systematic premium.',
   },
   {
     icon: '!',
@@ -250,8 +250,8 @@ const KEY_FINDINGS = [
     borderColor: 'rgba(239,68,68,0.5)',
     gradientFrom: 'rgba(239,68,68,0.10)',
     gradientTo: 'rgba(239,68,68,0.02)',
-    title: 'Injury History Carries a Significant Penalty',
-    body: 'Injury-prone players are valued ~20–25% lower than equivalent healthy players, even when performance stats are similar. The model captures this risk discount clearly.',
+    title: 'Injury & Risk Labels Are Independent of Value',
+    body: 'Injury-prone players average €90.5M vs €90.6M for healthy players. Transfer risk categories (Low/Medium/High) show similarly negligible differences, confirming all labels were assigned independently of market value.',
   },
 ]
 

@@ -476,7 +476,7 @@ function PCAMap({ allPlayers, pcaData, clusterLabels }) {
     <div style={sectionStyle}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h3 style={{ ...sectionTitleStyle, margin: 0 }}>PCA Player Map (2D projection of all stats)</h3>
-        <InfoIcon text="All 500 players projected onto the first two principal components. Each dot is a player colour-coded by K-Means cluster. Players in the same region share similar overall stat profiles." />
+        <InfoIcon text="All 2,800 players projected onto the first two principal components. Each dot is a player colour-coded by K-Means cluster. PC1 primarily captures overall ability (rating, value, goals) while PC2 tends to separate by age and positional role. Distinct cluster regions indicate genuinely different player archetypes." />
       </div>
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 16 }}>
         {Object.entries(CLUSTER_LABELS).map(([key, label]) => (

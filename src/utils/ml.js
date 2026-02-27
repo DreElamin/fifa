@@ -311,24 +311,35 @@ export class KNN {
 }
 
 // ─── Feature Importance (Permutation) ─────────────────────────────────────────
+// Fisher-Yates shuffle in place
+const fisherYates = (arr) => {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+}
+
 export const computeFeatureImportance = (nn, players) => {
   const featureNames = ['Age', 'Overall Rating', 'Potential', 'Position', 'Injury Prone', 'Contract Years']
-  const baseline = rmse(
-    players.map(p => p.market_value),
-    players.map(p => nn.predict(p))
-  )
+  const actuals = players.map(p => p.market_value)
+  const baseline = rmse(actuals, players.map(p => nn.predict(p)))
+
+  const N_TRIALS = 8
   return featureNames.map((name, fi) => {
-    const shuffledPlayers = players.map(p => {
-      const f = extractFeatures(p)
-      const orig = f[fi]
-      const r = Math.floor(Math.random() * players.length)
-      f[fi] = extractFeatures(players[r])[fi]
-      const pred = nn.predictNormalized(f) * 180
-      f[fi] = orig
-      return pred
-    })
-    const permRmse = rmse(players.map(p => p.market_value), shuffledPlayers)
-    return { name, importance: +(permRmse - baseline).toFixed(2) }
+    let totalPermRmse = 0
+    for (let t = 0; t < N_TRIALS; t++) {
+      // Proper full-column shuffle
+      const colValues = fisherYates(players.map(p => extractFeatures(p)[fi]))
+      const preds = players.map((p, idx) => {
+        const f = extractFeatures(p)
+        f[fi] = colValues[idx]
+        return nn.predictNormalized(f) * 180
+      })
+      totalPermRmse += rmse(actuals, preds)
+    }
+    const avgPermRmse = totalPermRmse / N_TRIALS
+    return { name, importance: +(avgPermRmse - baseline).toFixed(2) }
   }).sort((a, b) => b.importance - a.importance)
 }
 

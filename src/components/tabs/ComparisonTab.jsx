@@ -52,8 +52,13 @@ export default function ComparisonTab({ filteredPlayers }) {
   )
 
   const [selectedIds, setSelectedIds] = useState(initialIds)
+  const [search, setSearch] = useState('')
 
-  const displayPlayers = filteredPlayers.slice(0, 30)
+  const displayPlayers = useMemo(() => {
+    if (!search.trim()) return filteredPlayers
+    const q = search.toLowerCase()
+    return filteredPlayers.filter(p => p.name.toLowerCase().includes(q))
+  }, [filteredPlayers, search])
   const selectedPlayers = useMemo(
     () => filteredPlayers.filter((p) => selectedIds.includes(p.id)),
     [filteredPlayers, selectedIds]
@@ -110,7 +115,7 @@ export default function ComparisonTab({ filteredPlayers }) {
 
       {/* Player Selection */}
       <div style={sectionStyle}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <h3 style={{ ...sectionTitleStyle, margin: 0 }}>Player Selection</h3>
           <span style={{
             color: '#f97316',
@@ -124,7 +129,28 @@ export default function ComparisonTab({ filteredPlayers }) {
             {selectedIds.length} / 4 selected
           </span>
         </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 12, alignItems: 'center' }}>
+          <input
+            type="text"
+            placeholder="Search players..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{
+              flex: 1,
+              padding: '8px 12px',
+              borderRadius: 8,
+              border: '1px solid rgba(100,116,139,0.3)',
+              background: 'rgba(15,23,42,0.6)',
+              color: '#e2e8f0',
+              fontSize: 13,
+              outline: 'none',
+            }}
+          />
+          <span style={{ color: '#64748b', fontSize: 12, whiteSpace: 'nowrap' }}>
+            {displayPlayers.length} players
+          </span>
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxHeight: 260, overflowY: 'auto', paddingRight: 4 }}>
           {displayPlayers.map((p) => {
             const isSelected = selectedIds.includes(p.id)
             return (

@@ -97,8 +97,8 @@ Input (6)  →  Hidden 1 (16, ReLU)  →  Hidden 2 (8, ReLU)  →  Output (1, li
 **Training details:**
 
 - **Loss function:** Mean squared error (MSE) — `(predicted - actual)²`
-- **Optimizer:** SGD with momentum (`momentum = 0.9`, `lr = 0.01`)
-- **Epochs:** 120
+- **Optimizer:** SGD with momentum (`momentum = 0.9`, `lr = 0.015`)
+- **Epochs:** 160
 - **Batch style:** Online (stochastic) — one weight update per sample, shuffled each epoch
 - **Weight initialization:** He initialization — `W ~ Uniform(-0.5, 0.5) × sqrt(2 / fan_in)`, which keeps variance stable through ReLU activations
 

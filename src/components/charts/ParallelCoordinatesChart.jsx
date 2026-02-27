@@ -20,10 +20,10 @@ export default function ParallelCoordinatesChart({ players }) {
 
   const togglePosition = (pos) => {
     setActivePositions(prev => {
-      const next = new Set(prev)
-      if (next.has(pos)) next.delete(pos)
-      else next.add(pos)
-      return next
+      // If this is already the only selected position, clear to show all
+      if (prev.size === 1 && prev.has(pos)) return new Set()
+      // Otherwise show only this position
+      return new Set([pos])
     })
   }
 

@@ -184,7 +184,7 @@ export default function PredictorTab({ nn }) {
             position: 'relative',
           }}>
             <div style={{ position: 'absolute', top: 8, right: 8 }}>
-              <InfoIcon text="Neural network prediction trained on 2,800 real players. Uses a 3-layer MLP (6 inputs → 16 → 8 → 1 output) to learn non-linear relationships the linear formula cannot capture — for example, how age and rating interact differently for a GK vs a ST. The difference shown below compares it against the linear estimate." />
+              <InfoIcon text="Neural network prediction trained on 2,800 players. Uses a 3-layer MLP (6 inputs → 16 → 8 → 1 output). The NN learns non-linear interactions between rating, age, potential, and other features to estimate market value. It may diverge from the linear formula estimate for edge cases like very young high-potential players or older elite players." />
             </div>
             <div style={{ color: '#94a3b8', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
               AI Prediction

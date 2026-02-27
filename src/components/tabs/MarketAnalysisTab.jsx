@@ -13,11 +13,11 @@ import {
   BarChart,
   Bar,
   Cell,
+  ReferenceLine,
 } from 'recharts'
 import CustomTooltip from '../../components/common/CustomTooltip.jsx'
 import InfoIcon from '../../components/common/InfoIcon.jsx'
 import { colors } from '../../colors.js'
-import { mean } from '../../utils/stats.js'
 
 const sectionStyle = {
   background: 'rgba(30,41,59,0.6)',
@@ -64,10 +64,10 @@ function ScatterTooltip({ active, payload }) {
 
 // Rating tiers for bubble colour
 const RATING_TIERS = [
-  { label: '90+',   min: 90, color: '#ef4444' },
-  { label: '80–89', min: 80, color: '#f97316' },
-  { label: '70–79', min: 70, color: '#eab308' },
-  { label: '<70',   min: 0,  color: '#3b82f6' },
+  { label: '90+',   min: 90,  max: undefined, color: '#ef4444' },
+  { label: '80–89', min: 80,  max: 90,        color: '#f97316' },
+  { label: '70–79', min: 70,  max: 80,        color: '#eab308' },
+  { label: '<70',   min: 0,   max: 70,        color: '#3b82f6' },
 ]
 function ratingColor(r) {
   if (r >= 90) return '#ef4444'
@@ -96,14 +96,22 @@ function correlationLabel(r) {
 export default function MarketAnalysisTab({ filteredPlayers, analytics }) {
   const { positionAnalysis, correlations } = analytics
 
-  // Build scatter data: one point per player, bubble size from overall_rating
-  const scatterData = filteredPlayers.map((p) => ({
-    age: p.age,
-    market_value: p.market_value,
-    overall_rating: p.overall_rating,
-    name: p.name,
-    // Normalise rating to a reasonable bubble radius range 40–200
-    z: 40 + ((p.overall_rating - 60) / 40) * 160,
+  // Build scatter data split by rating tier for a readable legend
+  // Subsample every 2nd player to reduce clutter (~50% of players)
+  const allScatter = filteredPlayers
+    .filter((_, i) => i % 2 === 0)
+    .map((p) => ({
+      age: p.age,
+      market_value: p.market_value,
+      overall_rating: p.overall_rating,
+      name: p.name,
+      z: 30 + ((p.overall_rating - 60) / 40) * 120,
+    }))
+
+  const scatterTiers = RATING_TIERS.map(tier => ({
+    ...tier,
+    data: allScatter.filter(d => d.overall_rating >= tier.min &&
+      (tier.max === undefined || d.overall_rating < tier.max)),
   }))
 
   const correlationCards = [
@@ -135,30 +143,20 @@ export default function MarketAnalysisTab({ filteredPlayers, analytics }) {
         <div style={sectionStyle}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <p style={{ ...sectionTitleStyle, margin: 0 }}>Value vs Age (bubble size = rating)</p>
-            <InfoIcon text="Each bubble is a player. X-axis is age, Y-axis is market value. Bubble size and colour both reflect overall rating — bigger/redder = higher rated. The inverted-U shape shows the career peak value curve (ages 24–29). Hover a bubble for details." />
+            <InfoIcon text="Each bubble is a player. X-axis is age, Y-axis is market value. Bubble size and colour both reflect overall rating — bigger/redder = higher rated. Market value peaks around age 26 and declines for older players, so younger and prime-age players tend to cluster higher on the chart. Hover a bubble for details." />
           </div>
-          {/* Rating colour legend */}
-          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 12 }}>
-            {RATING_TIERS.map((t) => (
-              <div key={t.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: t.color, opacity: 0.85 }} />
-                <span style={{ color: '#94a3b8', fontSize: 11 }}>{t.label}</span>
-              </div>
-            ))}
-          </div>
-          <ResponsiveContainer width="100%" height={290}>
-            <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 16 }}>
+          <ResponsiveContainer width="100%" height={420}>
+            <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,116,139,0.15)" />
               <XAxis
                 type="number"
                 dataKey="age"
                 name="Age"
-                domain={[16, 40]}
-                ticks={[17, 20, 23, 26, 29, 32, 35, 38]}
+                domain={['dataMin - 1', 'dataMax + 1']}
                 tick={{ fill: '#94a3b8', fontSize: 11 }}
                 axisLine={{ stroke: 'rgba(100,116,139,0.3)' }}
                 tickLine={false}
-                label={{ value: 'Age', position: 'insideBottom', offset: -8, fill: '#94a3b8', fontSize: 11 }}
+                label={{ value: 'Age', position: 'insideBottom', offset: -30, fill: '#94a3b8', fontSize: 11 }}
               />
               <YAxis
                 type="number"
@@ -169,23 +167,37 @@ export default function MarketAnalysisTab({ filteredPlayers, analytics }) {
                 axisLine={{ stroke: 'rgba(100,116,139,0.3)' }}
                 tickLine={false}
                 tickFormatter={(v) => `€${v.toFixed(0)}M`}
-                width={52}
+                width={56}
               />
-              {/* ZAxis maps the z field (derived from rating) to bubble area */}
-              <ZAxis dataKey="z" range={[20, 280]} />
+              <ZAxis dataKey="z" range={[18, 200]} />
               <Tooltip content={<ScatterTooltip />} />
-              <Scatter data={scatterData} isAnimationActive={false}>
-                {scatterData.map((entry, i) => (
-                  <Cell
-                    key={i}
-                    fill={ratingColor(entry.overall_rating)}
-                    fillOpacity={0.55}
-                    stroke={ratingColor(entry.overall_rating)}
-                    strokeWidth={0.5}
-                    strokeOpacity={0.7}
-                  />
-                ))}
-              </Scatter>
+              <Legend
+                verticalAlign="bottom"
+                layout="horizontal"
+                align="center"
+                iconType="circle"
+                iconSize={8}
+                wrapperStyle={{
+                  fontSize: 11,
+                  color: '#94a3b8',
+                  paddingTop: 48,
+                  textAlign: 'center',
+                  width: '100%',
+                }}
+              />
+              {scatterTiers.map(tier => (
+                <Scatter
+                  key={tier.label}
+                  name={tier.label}
+                  data={tier.data}
+                  fill={tier.color}
+                  fillOpacity={0.5}
+                  stroke={tier.color}
+                  strokeWidth={0.4}
+                  strokeOpacity={0.7}
+                  isAnimationActive={false}
+                />
+              ))}
             </ScatterChart>
           </ResponsiveContainer>
         </div>
@@ -194,7 +206,7 @@ export default function MarketAnalysisTab({ filteredPlayers, analytics }) {
         <div style={sectionStyle}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <p style={{ ...sectionTitleStyle, margin: 0 }}>Avg Value by Position</p>
-            <InfoIcon text="Bar chart comparing the average market value across player positions. Attackers (ST, LW, RW) typically command the highest premiums. Each bar is colour-coded by position." />
+            <InfoIcon text="Bar chart comparing the average market value across player positions. Differences between positions reflect the distribution of overall ratings in the dataset — positions with more highly rated players will show higher average values. Each bar is colour-coded by position." />
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart
@@ -350,7 +362,7 @@ export default function MarketAnalysisTab({ filteredPlayers, analytics }) {
       <div style={sectionStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <p style={{ ...sectionTitleStyle, margin: 0 }}>Feature Correlation Heatmap</p>
-          <InfoIcon text="Heatmap of Pearson correlation coefficients between pairs of numerical features. Warm colours indicate positive correlation, cool colours negative. Strong correlations reveal features that move together." />
+          <InfoIcon text="Heatmap of Pearson correlation coefficients between pairs of numerical features. Warm colours (orange) = positive correlation, cool colours (blue) = negative. Rating↔Value and Potential↔Value should show strong positive correlations since market value is driven by those factors. Goals and Assists are derived from rating and position, so they also correlate moderately with Rating and Value. Age has a mild negative correlation with Value as performance peaks around 26." />
         </div>
         <HeatmapChart players={filteredPlayers} />
       </div>
