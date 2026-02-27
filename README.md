@@ -17,6 +17,7 @@ An interactive analytics dashboard for exploring FIFA player performance and mar
    - [Principal Component Analysis (PCA)](#principal-component-analysis-pca)
    - [Transfer Risk Classifier (Logistic Regression)](#transfer-risk-classifier-logistic-regression)
    - [KNN Similarity Search](#knn-similarity-search)
+   - [Value Predictor — Linear Baseline Model](#value-predictor--linear-baseline-model)
    - [Statistical Analysis](#statistical-analysis)
 4. [Key Findings](#key-findings)
 5. [Dashboard Tabs](#dashboard-tabs)
